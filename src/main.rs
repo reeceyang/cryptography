@@ -36,9 +36,16 @@ impl Zp {
         };
         Zp {p: self.p.clone(), value: inv}
     }
+
+    fn inverse(&self) -> Zp {
+        let (_n, inv) = ext_euclidean_alg(&self.value, &self.p);
+        let inv = (inv + self.p.clone()) % self.p.clone();
+        Zp {p: self.p.clone(), value: inv}
+    }
 }
 
 // returns the gcd of two Integers using the Euclidean Algorithm
+// could possibly use the euclidean_alg function to calculate this
 fn gcd(a: &Integer, b: &Integer) -> Integer {
     let mut r0: Integer = if a > b {a.clone()} else {b.clone()};
     let mut r1: Integer = if a > b {b.clone()} else {a.clone()};
@@ -72,7 +79,7 @@ fn euclidean_alg(a: &Integer, b: &Integer) -> Vec<Integer> {
     v
 }
 
-// assume a and b are relatively prime, returns solution u and v
+// assume a and b are relatively prime, returns solution u and v to ua+vb=1
 fn ext_euclidean_alg(a: &Integer, b: &Integer) -> (Integer, Integer) {
     let q = euclidean_alg(&a, &b);
     let mut p1: Integer = (&q[0]).clone();
@@ -105,15 +112,18 @@ fn main() {
         p: Integer::from(29996224275833i64),
         value: Integer::from(999999999989i64)
     };
-    println!("3 + 5 mod 7 is {:?}", z7_3.add(&z7_5));
+    /*println!("3 + 5 mod 7 is {:?}", z7_3.add(&z7_5));
     println!("3 - 5 mod 7 is {:?}", z7_3.subtract(&z7_5));
     println!("3 * 5 mod 7 is {:?}", z7_3.multiply(&z7_5));
     println!("gcd(2024, 748) = {}", gcd(&Integer::from(2024), &Integer::from(748)));
     println!("gcd(9000, 729) = {}", gcd(&Integer::from(9000), &Integer::from(729)));
-    println!("gcd(73, 25) = {:?}", euclidean_alg(&Integer::from(73), &Integer::from(25)));
-    //println!("The inverse of 5 mod 7 is {:?}", z7_5.native_inverse());
-    //println!("The inverse of 2 mod 123456789011 is {:?}", zbig_2.native_inverse());
-    let (u, v) = ext_euclidean_alg(&Integer::from(73), &Integer::from(25));
+    println!("gcd(73, 25) = {:?}", euclidean_alg(&Integer::from(73), &Integer::from(25)));*/
+    let (u, v) = ext_euclidean_alg(&Integer::from(5), &Integer::from(7));
     println!("u = {0}, v = {1}", u, v);
-    //println!("inverse of 999,999,999,989 mod 29,996,224,275,833 is {:?}", zbig_2.native_inverse());
+    println!("The inverse of 5 mod 7 is {:?}", z7_5.inverse());
+    println!("The inverse of 5 mod 7 is {:?}", z7_5.native_inverse());
+    let (u, v) = ext_euclidean_alg(&Integer::from(29996224275833i64), &Integer::from(999999999989i64));
+    println!("u = {0}, v = {1}", u, v);
+    println!("inverse of 999,999,999,989 mod 29,996,224,275,833 is {:?}", zbig_2.inverse());
+    println!("inverse of 999,999,999,989 mod 29,996,224,275,833 is {:?}", zbig_2.native_inverse());
 }
