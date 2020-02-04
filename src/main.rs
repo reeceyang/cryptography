@@ -27,7 +27,6 @@ impl Zp {
         }
         Zp {p: self.p.clone(), value: (self.value.clone() * a.value.clone()) % self.p.clone()}
     }
-
     // finds the inverse using the rug crate's built in inverse function
     fn native_inverse(&self) -> Zp {
         let inv = match self.value.clone().invert(&self.p) {
@@ -36,11 +35,26 @@ impl Zp {
         };
         Zp {p: self.p.clone(), value: inv}
     }
-
+    // my own implementation of the inverse function
     fn inverse(&self) -> Zp {
         let (_n, inv) = ext_euclidean_alg(&self.value, &self.p);
         let inv = (inv + self.p.clone()) % self.p.clone();
         Zp {p: self.p.clone(), value: inv}
+    }
+
+    fn power(&self, mut A: Integer) -> Zp {
+        let mut a = self.value.clone();
+        let mut b = Integer::from(1);
+        //println!("a: {0} b: {1} A: {2}", a, b, A);
+        while A > 0 {
+            if &A % Integer::from(2) == Integer::from(1) {
+                b = (b * &a) % &self.p;
+            }
+            a = Integer::from(&a * &a) % &self.p;
+            A /= Integer::from(2);
+            //println!("a: {0} b: {1} A: {2}", a, b, A);
+        }
+        Zp {p: self.p.clone(), value: b}
     }
 }
 
@@ -102,28 +116,7 @@ fn ext_euclidean_alg(a: &Integer, b: &Integer) -> (Integer, Integer) {
 fn main() {
     let z7_3 = Zp {
         p: Integer::from(7),
-        value: Integer::from(3),
-    };
-    let z7_5 = Zp {
-        p: Integer::from(7),
         value: Integer::from(5),
     };
-    let zbig_2 = Zp {
-        p: Integer::from(29996224275833i64),
-        value: Integer::from(999999999989i64)
-    };
-    /*println!("3 + 5 mod 7 is {:?}", z7_3.add(&z7_5));
-    println!("3 - 5 mod 7 is {:?}", z7_3.subtract(&z7_5));
-    println!("3 * 5 mod 7 is {:?}", z7_3.multiply(&z7_5));
-    println!("gcd(2024, 748) = {}", gcd(&Integer::from(2024), &Integer::from(748)));
-    println!("gcd(9000, 729) = {}", gcd(&Integer::from(9000), &Integer::from(729)));
-    println!("gcd(73, 25) = {:?}", euclidean_alg(&Integer::from(73), &Integer::from(25)));*/
-    let (u, v) = ext_euclidean_alg(&Integer::from(5), &Integer::from(7));
-    println!("u = {0}, v = {1}", u, v);
-    println!("The inverse of 5 mod 7 is {:?}", z7_5.inverse());
-    println!("The inverse of 5 mod 7 is {:?}", z7_5.native_inverse());
-    let (u, v) = ext_euclidean_alg(&Integer::from(29996224275833i64), &Integer::from(999999999989i64));
-    println!("u = {0}, v = {1}", u, v);
-    println!("inverse of 999,999,999,989 mod 29,996,224,275,833 is {:?}", zbig_2.inverse());
-    println!("inverse of 999,999,999,989 mod 29,996,224,275,833 is {:?}", zbig_2.native_inverse());
+    println!("power: {:?}", z7_3.power(Integer::from(2)));
 }
