@@ -1,122 +1,17 @@
+mod zp;
+mod elgamal;
+
 use rug::Integer;
-use std::cmp;
-
-#[derive(Debug)]
-struct Zp {
-    p: Integer,
-    value: Integer
-}
-
-// this can probably be cleaned up - do we actually need all the clones?
-impl Zp {
-    fn add(&self, a: &Zp) -> Zp {
-        if a.p != self.p {
-            // throw an error?
-        }
-        Zp {p: self.p.clone(), value: (self.value.clone() + a.value.clone()) % self.p.clone()}
-    }
-    fn subtract(&self, a: &Zp) -> Zp {
-        if a.p != self.p {
-            // throw an error?
-        }
-        Zp {p: self.p.clone(), value: (self.value.clone() - a.value.clone() + self.p.clone()) % self.p.clone()}
-    }
-    fn multiply(&self, a: &Zp) -> Zp {
-        if a.p != self.p {
-            // throw an error?
-        }
-        Zp {p: self.p.clone(), value: (self.value.clone() * a.value.clone()) % self.p.clone()}
-    }
-    // finds the inverse using the rug crate's built in inverse function
-    fn native_inverse(&self) -> Zp {
-        let inv = match self.value.clone().invert(&self.p) {
-            Ok(inverse) => inverse,
-            Err(_) => unreachable!(),
-        };
-        Zp {p: self.p.clone(), value: inv}
-    }
-    // my own implementation of the inverse function
-    fn inverse(&self) -> Zp {
-        let (_n, inv) = ext_euclidean_alg(&self.value, &self.p);
-        let inv = (inv + self.p.clone()) % self.p.clone();
-        Zp {p: self.p.clone(), value: inv}
-    }
-
-    fn power(&self, mut A: Integer) -> Zp {
-        let mut a = self.value.clone();
-        let mut b = Integer::from(1);
-        //println!("a: {0} b: {1} A: {2}", a, b, A);
-        while A > 0 {
-            if &A % Integer::from(2) == Integer::from(1) {
-                b = (b * &a) % &self.p;
-            }
-            a = Integer::from(&a * &a) % &self.p;
-            A /= Integer::from(2);
-            //println!("a: {0} b: {1} A: {2}", a, b, A);
-        }
-        Zp {p: self.p.clone(), value: b}
-    }
-}
-
-// returns the gcd of two Integers using the Euclidean Algorithm
-// could possibly use the euclidean_alg function to calculate this
-fn gcd(a: &Integer, b: &Integer) -> Integer {
-    let mut r0: Integer = if a > b {a.clone()} else {b.clone()};
-    let mut r1: Integer = if a > b {b.clone()} else {a.clone()};
-    loop {
-        let r: Integer = Integer::from(&r0 % &r1);
-        if r.cmp(&Integer::from(0)) == cmp::Ordering::Equal {
-            break;
-        } else {
-            r0 = r1;
-            r1 = r;
-        }
-    }
-    r1
-}
-
-// returns a list of divisors using the Euclidean Algorithm
-fn euclidean_alg(a: &Integer, b: &Integer) -> Vec<Integer> {
-    let mut v: Vec<Integer> = Vec::new();
-    let mut r0: Integer = if a > b {a.clone()} else {b.clone()};
-    let mut r1: Integer = if a > b {b.clone()} else {a.clone()};
-    loop {
-        let (q, r) = r0.div_rem(r1.clone());
-        v.push(q);
-        if r.cmp(&Integer::from(0)) == cmp::Ordering::Equal {
-            break;
-        } else {
-            r0 = r1;
-            r1 = r;
-        }
-    }
-    v
-}
-
-// assume a and b are relatively prime, returns solution u and v to ua+vb=1
-fn ext_euclidean_alg(a: &Integer, b: &Integer) -> (Integer, Integer) {
-    let q = euclidean_alg(&a, &b);
-    let mut p1: Integer = (&q[0]).clone();
-    let mut p2: Integer = Integer::from(&q[1] * &p1 + &Integer::from(1));
-    let mut q1: Integer = Integer::from(1);
-    let mut q2: Integer = Integer::from(&q[1] * &q1);
-    let len = q.len();
-    for i in 2..len {
-        let temp = p2.clone();
-        p2 = Integer::from(&q[i] * &p2 + &p1);
-        p1 = temp;
-        let temp = q2.clone();
-        q2 = Integer::from(&q[i] * &q2 + &q1);
-        q1 = temp;
-    }
-    let parity = if len % 2 == 0 {1} else {-1};
-    (q1 * parity, p1 * parity * -1)
-}
 
 fn main() {
-    let z7_3 = Zp {
-        p: Integer::from(7),
-        value: Integer::from(5),
-    };
-    println!("power: {:?}", z7_3.power(Integer::from(2)));
+    let p = "760681717941856831493320494208068699140713615709244503770380357386684376451163275956323230773372045479498736854429937506339056773136102046458744157098410521433745533964035145783307274286672175365520411863658229193477406633825672621704053004446185290381871205754849060960807674317745831400623659116495750659568823365579547632949894086980592241843236320593668652662657694664132180825622168594880261903489873667483324930795035590547956395647058051136529829413096933294706420743213034951394917396407024909570661267632883851196108705655193853415548847489930230927776901820536478761605849576486751074177964880780177393483567699008868825281455829611008660051877250086776100150424967920297125606831988248093302916614768638681686825776219569530666588290436546553113957313179856477758951065545316623271950861851567111966863294279028191118552049005261884024390842194693299366339508455807123485655520254056476216550687434001755192433389531226439939278795282113143854079262420632212292062973281150597405303345825960440499710579146400639".parse::<Integer>().unwrap();
+    let g = "17995411248371911950836273908507577782072461236743908340835025453026197765059103962770828326330044810935691633602157759633661666129589131871354455865352410551258925734076774741579510911726824471938874465479574785754351051076129978680443663000963867209689136918087589372035996941508408629848653267438659369795189757973874765467774169404837767073722349221543670117613498254638632169982186584522074197753491158936176088364303323437353304807628520234246504586917346412778821908492695003366947470839974384483273231556389465070500028461496884388694903161882361714777937573550058824930361291424963642175435721553838718626040085436873035892674616325484156185812276256216300384456112229579596906796772599531730302949212910758931960116390060379144156028129039770420040524362027300870743480935681749179041970736138348869216106347601768576156108030332425976836181227747591245070777630132548652845189908996458926475683928120075800980833448567635142923980939954906489986946813088197851219088054271763738257011500527791527823571984673754".parse::<Integer>().unwrap();
+    let A = "590862035714954070493124894401920222466718538155890546023479588743164100979590147769814123819917175139956472832559011135615357699569371591427084596733912168213668591433984501049610977808677037006145603944558820364899230639933002736617826075479952568667442134814159868350082546278270466973421016527869364205059290062336496040732695083597201666216755254612306883623971521422965709692097639507115691837764787516598544358233342919430514594506848376885231165131645879031568194440435161091390922711855103543225863922528198243845054527742841608291688699684869718885953267970561072943206479366925623777143596759187051480113188504095261191051057113261397120306962884402698241721617648829735987246382338343125557823605746120881116612146574595478449678871269371850354262547967651479729234046632321988855931393768191408120790034989442874408895322670098558692711220968447309620201510353051436164345197591615275513860914637434389593811258460983266714751365314717901141629615685038835715412356776439112480615146827818218203622098796556147".parse::<Integer>().unwrap();
+    let m = Integer::from(2i64);
+    let k = Integer::from(3);
+    let (c1, c2) = elgamal::encrypt(&m, &k, &A, &p, &g);
+    //println!("c1 = {}", c1);
+    //println!("c2 = {}", c2);
+    let p = Integer::from(4);
+    println!("is p prime? {}", zp::is_prime(&p));
 }
