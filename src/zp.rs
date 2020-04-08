@@ -1,6 +1,5 @@
 use rug::Integer;
 use std::cmp;
-use rand::Rng;
 
 #[derive(Debug)]
 pub struct Zp {
@@ -133,54 +132,4 @@ pub fn ext_euclidean_alg(a: &Integer, b: &Integer) -> (Integer, Integer) {
     }
     let parity = if len % 2 == 0 {1} else {-1};
     (q1 * parity, p1 * parity * -1)
-}
-
-pub fn is_prime(n: &Integer) -> bool {
-    let mut is_prime = true;
-    for i in 1..300 {
-        if miller_rabin(n, &generate_candidate_witness()) {
-            is_prime = false;
-            break;
-        }
-    }
-    is_prime
-}
-
-// returns true if composite
-pub fn miller_rabin(n: &Integer, a1: &Integer) -> bool {
-    let mut a = a1.clone();
-    if n % Integer::from(2) == Integer::from(0) || (1 < gcd(&a, &n) && &gcd(&a, &n) < n) {
-        return true;
-    } else {
-        let (k, q) = find_k(&Integer::from(n - 1));
-        let mut a = power(&a, &q, n);
-        if Integer::from(&a % n).cmp(&Integer::from(1)) == cmp::Ordering::Equal {
-            return false;
-        } else {
-            let mut i: Integer = Integer::from(0);
-            while i < Integer::from(&k - 1) {
-                if Integer::from(&a % n).cmp(&Integer::from(n - 1)) == cmp::Ordering::Equal {
-                    return false;
-                }
-                a = Integer::from(&a * &a) % n;
-            }
-        }
-    }
-    true
-}
-
-// given n returns (k, q) such that 2^k
-pub fn find_k(n: &Integer) -> (Integer, Integer) {
-    let mut k = Integer::from(0);
-    let mut q = n.clone();
-    while Integer::from(&k % 2) == Integer::from(0) {
-        q /= 2;
-        k += 1;
-    }
-    (k, q)
-}
-
-// generate a candidate witness
-fn generate_candidate_witness() -> Integer {
-    Integer::from(9699690) * Integer::from(rand::thread_rng().gen_range(1, 9699690)) + 1
 }
