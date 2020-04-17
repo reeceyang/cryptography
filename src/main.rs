@@ -3,6 +3,7 @@ mod elgamal;
 mod primality;
 mod encoding;
 mod tests;
+mod rsa;
 
 use rug::Integer;
 use std::env;
@@ -11,8 +12,8 @@ use std::io;
 
 fn main() {
 
-    tests::test_primality();
-
+    //tests::test_primality();
+    tests::test_rsa();
     /*let mut input = String::new();
     let mut system = String::new();
     let mut operation = String::new();

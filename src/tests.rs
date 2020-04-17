@@ -6,6 +6,20 @@ use std::io::{BufReader, BufRead, Error};
 use crate::primality;
 use crate::encoding;
 use crate::elgamal;
+use crate::rsa;
+
+pub fn test_rsa() {
+    let (p, q) = rsa::generate_random_p_q();
+    println!("p: {}", p);
+    println!("q: {}", q);
+    let (N, e) = rsa::generate_public_key(&p, &q);
+    println!("N: {}", N);
+    println!("e: {}", e);
+    let c = rsa::encrypt(&Integer::from(1234), &N, &e);
+    println!("c: {}", c);
+    let m_prime = rsa::decrypt(&c, &e, &p, &q, &N);
+    println!("m': {}", m_prime);
+}
 
 pub fn test_primality() -> Result<(), Error> {
     let path = "primes.txt";
