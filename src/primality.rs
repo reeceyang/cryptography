@@ -69,9 +69,10 @@ pub fn generate_random_prime(n: &usize) -> Integer {
         let mut rand = RandState::new();
         let mut seed = Integer::new();
         match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
-            Ok(n) => seed = Integer::from(n.as_secs()),
+            Ok(n) => seed = Integer::from(n.as_micros()),
             Err(_) => panic!("SystemTime before UNIX EPOCH!"),
         }
+        println!("seed: {}", seed);
         rand.seed(&seed);
         let mut candidate = Integer::from(rand.bits(32));
         candidate.set_bit(0, true);
