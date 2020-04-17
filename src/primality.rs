@@ -5,7 +5,7 @@ use crate::zp;
 
 pub fn is_prime(n: &Integer) -> bool {
     let mut is_prime = true;
-    for _i in 1..300 {
+    for _i in 1..30 {
         if miller_rabin(n, &generate_candidate_witness()) {
             is_prime = false;
             break;
@@ -18,22 +18,27 @@ pub fn is_prime(n: &Integer) -> bool {
 pub fn miller_rabin(n: &Integer, a1: &Integer) -> bool {
     let a = a1.clone();
     if n % Integer::from(2) == Integer::from(0) || (1 < zp::gcd(&a, &n) && &zp::gcd(&a, &n) < n) {
+        println!("first condition - composite");
         return true;
     } else {
         let (k, q) = find_k(&Integer::from(n - 1));
         let mut a = zp::power(&a, &q, n);
         if Integer::from(&a % n).cmp(&Integer::from(1)) == cmp::Ordering::Equal {
+            println!("a equiv 1 mod n - test fails");
             return false;
         } else {
-            let i: Integer = Integer::from(0);
-            while i < Integer::from(&k - 1) {
-                if Integer::from(&a % n).cmp(&Integer::from(n - 1)) == cmp::Ordering::Equal {
+            let mut i: Integer = Integer::from(0);
+            while i <= Integer::from(&k - 1) {
+                if Integer::from((a.clone() + Integer::from(1)) % n).cmp(&Integer::from(0)) == cmp::Ordering::Equal {
+                    println!("a equiv -1 mod n - test fails");
                     return false;
                 }
                 a = Integer::from(&a * &a) % n;
+                i += 1;
             }
         }
     }
+    println!("end of loop - composite");
     true
 }
 
