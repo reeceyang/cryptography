@@ -4,6 +4,8 @@ mod primality;
 mod encoding;
 mod tests;
 mod rsa;
+mod elliptic_curves;
+mod elliptic_elgamal;
 
 use rug::Integer;
 use std::env;
@@ -37,5 +39,5 @@ fn main() {
         _ => panic!("Invalid input!")
     }
 
-    
+
 }
