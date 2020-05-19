@@ -16,7 +16,8 @@ fn main() {
 
     //tests::test_primality();
     //tests::test_rsa();
-    tests::test_elliptic_curves();
+    //tests::test_elliptic_curves();
+    tests::test_elliptic_elgamal();
 
     /*
     let mut input = String::new();

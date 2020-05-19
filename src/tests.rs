@@ -8,6 +8,24 @@ use crate::encoding;
 use crate::elgamal;
 use crate::rsa;
 use crate::elliptic_curves;
+use crate::elliptic_elgamal;
+
+pub fn test_elliptic_elgamal() {
+    let c = elliptic_curves::EllipticCurve {p: Integer::from(13), a: Integer::from(3), b: Integer::from(8)};
+    let P = elliptic_curves::Point {x: Integer::from(9), y: Integer::from(7)};
+    let elel = elliptic_elgamal::EllipticElgamal {E: c, P: P};
+    let nA = Integer::from(5);
+    println!("Private key: {:?}", nA);
+
+    let Qa = elel.generate_public_key(&nA);
+    println!("Public key: {:?}", Qa);
+
+    let M = elliptic_curves::Point {x: Integer::from(1), y: Integer::from(8)};
+    let (c1, c2) = elel.encrypt(&M, &Integer::from(3), &Qa);
+    println!("c1: {0:?}, c2: {1:?}", c1, c2);
+    let decrypted = elel.decrypt(&c1, &c2, &nA);
+    println!("decrypted: {:?}", decrypted);
+}
 
 pub fn test_elliptic_curves() {
     let c = elliptic_curves::EllipticCurve {p: Integer::from(13), a: Integer::from(3), b: Integer::from(8)};
