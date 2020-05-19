@@ -59,9 +59,12 @@ impl Zp {
 }
 
 pub fn inverse(a: &Integer, p: &Integer) -> Integer {
-    let (_n, inv) = ext_euclidean_alg(a, p);
-    let inv = (inv + p.clone()) % p.clone();
-    inv
+    if a != &Integer::from(1) {
+        let (_n, inv) = ext_euclidean_alg(a, p);
+        let inv = (inv + p.clone()) % p.clone();
+        return inv;
+    }
+    Integer::from(1)
 }
 
 // returns the gcd of two Integers using the Euclidean Algorithm

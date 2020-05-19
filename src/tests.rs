@@ -7,6 +7,19 @@ use crate::primality;
 use crate::encoding;
 use crate::elgamal;
 use crate::rsa;
+use crate::elliptic_curves;
+
+pub fn test_elliptic_curves() {
+    let c = elliptic_curves::EllipticCurve {p: Integer::from(13), a: Integer::from(3), b: Integer::from(8)};
+    let p = elliptic_curves::Point {x: Integer::from(9), y: Integer::from(7)};
+    let q = elliptic_curves::Point {x: Integer::from(1), y: Integer::from(8)};
+    println!("Curve contains point: {}", c.contains_point(&q));
+    let sum = elliptic_curves::add(&p, &p, &c);
+    println!("Sum = {:?}", sum);
+    let prod = elliptic_curves::multiply(&p, &Integer::from(2), &c);
+    println!("Product = {:?}", prod);
+}
+
 
 pub fn test_rsa() {
     let (p, q) = rsa::generate_random_p_q();

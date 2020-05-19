@@ -16,7 +16,9 @@ fn main() {
 
     //tests::test_primality();
     //tests::test_rsa();
+    tests::test_elliptic_curves();
 
+    /*
     let mut input = String::new();
     let mut system = String::new();
     let mut operation = String::new();
@@ -38,6 +40,6 @@ fn main() {
         "2" => system = "elgamal".to_string(),
         _ => panic!("Invalid input!")
     }
-
+    */
 
 }
